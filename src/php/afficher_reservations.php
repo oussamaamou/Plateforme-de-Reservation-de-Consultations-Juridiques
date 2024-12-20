@@ -65,15 +65,38 @@
                             <th scope="col" class="px-6 py-3">
                                 Status
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" class="annltbl px-6 py-3">
                                 Action
                             </th>
-                            <th scope="col" class="px-6 py-3">
-                                Action
-                            </th>
+                            
                         </tr>
                     </thead>
 
+                    <tbody id="rsrvtioncard">
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            
+                            <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                                <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Jese image">
+                                <div class="ps-3">
+                                    <div class="text-base font-semibold">Ahmed Rachad</div>
+                                    <div class="font-normal text-gray-500">rachad@gmail.com</div>
+                                </div>  
+                            </th>
+                            <td class="px-6 py-4">
+                                25-12-2024
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Confirmée
+                                </div>
+                            </td>
+                            <td class="annltbl px-6 py-4">
+                                <button id="dltersrvtion" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
+                            </td>
+                            
+                        </tr>
+                    </tbody>
+
                     <tbody>
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                             
@@ -94,9 +117,6 @@
                             </td>
                             <td class="px-6 py-4">
                                 <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
                             </td>
                         </tr>
                     </tbody>
@@ -122,9 +142,6 @@
                             <td class="px-6 py-4">
                                 <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
                             </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
-                            </td>
                         </tr>
                     </tbody>
 
@@ -148,36 +165,6 @@
                             </td>
                             <td class="px-6 py-4">
                                 <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                            
-                            <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Jese image">
-                                <div class="ps-3">
-                                    <div class="text-base font-semibold">Ahmed Rachad</div>
-                                    <div class="font-normal text-gray-500">rachad@gmail.com</div>
-                                </div>  
-                            </th>
-                            <td class="px-6 py-4">
-                                25-12-2024
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Confirmée
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
                             </td>
                         </tr>
                     </tbody>
