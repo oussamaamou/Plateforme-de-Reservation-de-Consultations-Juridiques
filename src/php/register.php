@@ -1,4 +1,17 @@
 <?php 
+    include 'config.php';
+    include 'avocat_functions.php';
+
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $nom = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $role = $_POST['role'];
+        $telephone = $_POST['telephone'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        addAccount($nom, $prenom, $role, $telephone, $email, $password);
+    }
 ?>
 
 
@@ -26,7 +39,10 @@
                         <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                         Créer votre compte
                         </h1>
-                        <form class="space-y-4 md:space-y-6" action="" method="$_POST">
+                        <form class="space-y-4 md:space-y-6" method="POST">
+                            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                                Veuillez remplir <span class="font-medium">tous les champs</span> obligatoires!
+                            </div>
                             <div>
                                 <label for="nom" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nom</label>
                                 <input type="text" name="nom" id="nom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ahmed" required="">
@@ -40,11 +56,10 @@
                                 <input type="text" name="telephone" id="telephone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="0758964231" required="">
                             </div>
                             <div>
-                                <label for="default" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rôle</label>
-                                <select id="default" class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                    <option selected>Choisissez un rôle</option>
-                                    <option value="0">Client</option>
-                                    <option value="1">Avocat</option>
+                                <label for="role" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rôle</label>
+                                <select id="role" name="role" required class="bg-gray-50 border border-gray-300 text-gray-900 mb-6 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="1">Client</option>
+                                    <option value="2">Avocat</option>
                                 </select>
                             </div>
                             <div>
