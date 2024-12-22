@@ -11,13 +11,7 @@ bttnmdfie?.addEventListener('click', function(){
     ctnr1.classList.remove('hidden');
 });
 
-
-/////////////////////////////////////////////////////////
-const specialite = document.getElementById("specialite");
-const spcltctnt = document.getElementById("spcltctnt");
-spcltctnt.textContent = specialite.value;
-////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 
 
-const bttncsttion = document.getElementById("csttionbttn");
 
