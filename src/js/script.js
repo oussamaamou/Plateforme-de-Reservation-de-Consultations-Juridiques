@@ -1,29 +1,23 @@
 const ctnr1 = document.getElementById("ctnrcsltion");
 const xmark1 = document.getElementById("xmarkcsltion");
-
+const bttnmdfie = document.getElementById("mdfiebttn");
  
 xmark1?.addEventListener('click', function(){
-    ctnr1.style.display = 'none';
+    ctnr1.classList.add('hidden');
 });
 
 
-
-const cfrmbttn1 = document.getElementById("cfrmrsrvtion");
-const annltblelmt = document.querySelectorAll('.annltbl');
-
-cfrmbttn1?.addEventListener('click', function(){
-    annltblelmt.forEach(element => {
-        element.style.display = 'none';
-    })
+bttnmdfie?.addEventListener('click', function(){
+    ctnr1.classList.remove('hidden');
 });
 
-/////////////////////////////////////////////////////////////////////////
 
-const dltebttn1 = document.getElementById("dltersrvtion");
-const cardrsrvtion = document.getElementById("rsrvtioncard");
+/////////////////////////////////////////////////////////
+const specialite = document.getElementById("specialite");
+const spcltctnt = document.getElementById("spcltctnt");
+spcltctnt.textContent = specialite.value;
+////////////////////////////////////////////////////////
 
-dltebttn1?.addEventListener('click', function(){
-    cardrsrvtion.style.display = 'none';
-});
 
+const bttncsttion = document.getElementById("csttionbttn");
 
