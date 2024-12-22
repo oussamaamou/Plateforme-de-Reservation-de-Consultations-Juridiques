@@ -11,6 +11,7 @@
         $password = $_POST['password'];
 
         addAccount($nom, $prenom, $role, $telephone, $email, $password);
+        header('location: login.php');
     }
 ?>
 
