@@ -281,6 +281,12 @@
     </footer>
     
 
-    <script src="../js/script.js"></script>
+    <script src="../js/script.js">
+        
+        const specialite = document.getElementById("specialite");
+        const spcltctnt = document.getElementById("spcltctnt");
+        spcltctnt.textContent = specialite.value;
+        
+    </script>
 </body>
 </html>
