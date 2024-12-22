@@ -4,12 +4,31 @@
 
     session_start();
 
+    
+    $ID = $_SESSION['ID'];
+    $avocat_ID = $_POST['avocat_ID'] ?? null; 
+    $Statut = 'Confirmée';
+
+    
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $date_reservation = $_POST['date_reservation'];
+
+        addReservation($ID, $avocat_ID, $date_reservation, $Statut);
+    }
+
+    
+
+
+
     if(!isset($_SESSION['ID'])){
         header('location: login.php');
         exit();
     }
 
+
     $avocats = getAllConsultations();
+
+    $client = getClientProfile($ID);
 
 ?>
 
@@ -66,14 +85,15 @@
     <main>
         
         <!-- Reservation Form-->
-        <div id="ctnrcsltion" class="hidden fixed left-[32rem] flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div id="ctnrcsltion" class="hidden fixed left-[32rem] top-[-1rem] flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
             <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                 <i id="xmarkcsltion" class="fa-solid fa-xmark ml-[26rem] text-2xl cursor-pointer mt-[1.2rem]" style="color: #2e2e2e;"></i>
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                     <h1 class="text-xl font-bold leading-tight tracking-tight text-stone-700 md:text-2xl dark:text-white">
                         Reserver une Consultation
                     </h1>
-                    <form class="space-y-4 md:space-y-6" action="#">
+                    <form class="space-y-4 md:space-y-6" method="POST">
+                        <input type="hidden" name="avocat_ID" id="avocat_ID" value="">
                         <div class="grid lg:grid-cols-2 gap-6">
                             <div>
                                 <label for="nom" class="block mb-2 text-sm font-medium text-stone-700 dark:text-white">Nom</label>
@@ -103,7 +123,6 @@
         <section>
             
             <?php foreach( $avocats as $avocat ){ 
-                
             ?>
             <!-- Avocat Card-->
             <div class="mt-[4rem] ml-[20rem] bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in pt-[3.5rem]">
@@ -112,7 +131,7 @@
                         <img src="uploads/<?php echo $avocat['Photo']; ?>" alt="Profile Picture" class="rounded-full w-48 h-48 mx-auto mb-4 border-4 border-yellow-500 transition-transform duration-300 hover:scale-105">
                         <h1 class="text-2xl font-bold text-yellow-500 dark:text-white mb-2"><?php echo htmlspecialchars($avocat['Nom'] . ' ' . htmlspecialchars($avocat['Prenom'])) ?></h1>
                         <p class="text-stone-700 font-semibold">Avocat</p>
-                        <button id="csttionbttn" class="mt-4 font-medium text-white px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:bg-gradient-to-br transition-colors duration-300">Reserver</button>
+                        <button onclick="addConsultationForm(<?php echo $avocat['ID']; ?>)" class="mt-4 font-medium text-white px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:bg-gradient-to-br transition-colors duration-300">Reserver</button>
                     </div>
                     <div class="md:w-2/3 md:pl-8">
                         <h2 class="text-xl font-semibold text-yellow-500 dark:text-white mb-4">Biographie</h2>
@@ -168,6 +187,22 @@
         </div>
     </footer>
 
-    <script src="../js/script.js"></script>
+    <script>
+
+        const clientData = <?php echo json_encode($client); ?>;
+
+        function addConsultationForm(avocat_ID) {
+            document.getElementById("avocat_ID").value = avocat_ID;
+            document.getElementById("nom").value = clientData.Nom;
+            document.getElementById("prenom").value = clientData.Prenom;
+            document.getElementById("telephone").value = clientData.Telephone;
+
+            document.getElementById("ctnrcsltion").classList.remove('hidden');
+        };
+
+        document.getElementById("xmarkcsltion").addEventListener('click', function(){
+            document.getElementById("ctnrcsltion").classList.add('hidden');
+        });
+    </script>
 </body>
 </html>
