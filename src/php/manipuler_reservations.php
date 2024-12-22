@@ -1,12 +1,20 @@
 <?php 
+    include 'config.php';
+    include 'client_functions.php';
 
     session_start();
+
+    $ID = $_SESSION['ID'];
+
+    $reservations = getAllReservation($ID);
+
+    $ID_Reservation = $_POST['reservation_ID'] ?? null;
+    annulerReservation($ID_Reservation);
 
     if(!isset($_SESSION['ID'])){
         header('location: login.php');
         exit();
     }
-    
 ?>
 
 <!DOCTYPE html>
@@ -42,16 +50,16 @@
                 <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1 mt-[-3rem]" id="mobile-menu-2">
                     <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
                         <li>
-                            <a href="avocat_dashboard.php" class="block py-2 pr-4 pl-3 text-stone-700 rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white" aria-current="page">Home</a>
+                            <a href="client_dashboard.php" class="block py-2 pr-4 pl-3 text-stone-700 rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white" aria-current="page">Home</a>
                         </li>
                         <li>
-                            <a href="avocat_profile.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Profile</a>
+                            <a href="client_profile.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Profile</a>
                         </li>
                         <li>
-                            <a href="manipuler_reservations.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Reservations</a>
+                            <a href="afficher_reservations.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Reservations</a>
                         </li>
                         <li>
-                            <a href="avocat_disponibilite.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Disponibilité</a>
+                            <a href="afficher_consultations.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Consultations</a>
                         </li>
                     </ul>
                 </div>
@@ -63,6 +71,7 @@
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
             <div class="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900">
                 
+                <input type="hidden" name="reservation_ID" id="reservation_ID" value="">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -78,24 +87,22 @@
                             <th scope="col" class="annltbl px-6 py-3">
                                 Action
                             </th>
-                            <th scope="col" class="annltbl px-6 py-3">
-                                Action
-                            </th>
+                            
                         </tr>
                     </thead>
-
+                    <?php foreach($reservations as $reservation){ ?>
                     <tbody id="rsrvtioncard">
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                             
                             <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Jese image">
+                                <img class="w-10 h-10 rounded-full" src="uploads/<?php echo $reservation['client_photo'];?>" alt="client Profile Picture">
                                 <div class="ps-3">
-                                    <div class="text-base font-semibold">Ahmed Rachad</div>
-                                    <div class="font-normal text-gray-500">rachad@gmail.com</div>
+                                    <div class="text-base font-semibold"><?php echo htmlspecialchars($reservation['client_nom'] . ' ' . htmlspecialchars($reservation['client_prenom'])) ?></div>
+                                    <div class="font-normal text-gray-500"><?php echo htmlspecialchars($reservation['client_email']) ?></div>
                                 </div>  
                             </th>
                             <td class="px-6 py-4">
-                                25-12-2024
+                                <?php echo htmlspecialchars($reservation['Date_Consultation']) ?>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
@@ -103,94 +110,12 @@
                                 </div>
                             </td>
                             <td class="annltbl px-6 py-4">
-                                <button id="dltersrvtion" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
+                                <button onclick="getIdReservation(<?php echo $reservation['reservation_id']; ?>)" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
                             </td>
-                            <td class="annltbl px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                             
-                            <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Jese image">
-                                <div class="ps-3">
-                                    <div class="text-base font-semibold">Ahmed Rachad</div>
-                                    <div class="font-normal text-gray-500">rachad@gmail.com</div>
-                                </div>  
-                            </th>
-                            <td class="px-6 py-4">
-                                25-12-2024
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Confirmée
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
-                            </td>
                         </tr>
                     </tbody>
-
-                    <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                            
-                            <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Jese image">
-                                <div class="ps-3">
-                                    <div class="text-base font-semibold">Ahmed Rachad</div>
-                                    <div class="font-normal text-gray-500">rachad@gmail.com</div>
-                                </div>  
-                            </th>
-                            <td class="px-6 py-4">
-                                25-12-2024
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Confirmée
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                            
-                            <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                <img class="w-10 h-10 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Jese image">
-                                <div class="ps-3">
-                                    <div class="text-base font-semibold">Ahmed Rachad</div>
-                                    <div class="font-normal text-gray-500">rachad@gmail.com</div>
-                                </div>  
-                            </th>
-                            <td class="px-6 py-4">
-                                25-12-2024
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Confirmée
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button  id="annltbl" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
-                            </td>
-                            <td class="px-6 py-4">
-                                <button id="cfrmrsrvtion" class="font-medium text-green-600 hover:cursor-pointer">Confirmer</button>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <?php } ?>
                 </table>
 
             </div>
@@ -220,6 +145,13 @@
         </div>
     </footer>
 
-    <script src="../js/script.js"></script>
+    <script>
+
+        function getIdReservation(reservation_ID) {
+            document.getElementById("reservation_ID").value = reservation_ID;
+
+        };
+        
+    </script>
 </body>
 </html>
