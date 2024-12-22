@@ -1,4 +1,75 @@
-<?php ?>
+<?php 
+    include 'config.php';
+    include 'client_functions.php';
+
+    session_start();
+
+    if(!isset($_SESSION['ID'])){
+        header('location: login.php');
+        exit();
+    }
+
+    $ID = $_SESSION['ID']; 
+
+    $clientProfile = getClientProfile($ID);
+    if ($clientProfile) {
+        $nom = $clientProfile['Nom'];
+        $prenom = $clientProfile['Prenom'];
+        $photo = $clientProfile['Photo'];
+        $telephone = $clientProfile['Telephone'];
+        $email = $clientProfile['Email'];
+        $mot_de_passe = $clientProfile['Mot_de_passe'];
+    } else {
+
+        echo "Profile non trouvé.";
+        exit();
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $nom = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $telephone = $_POST['telephone'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        
+        $photo = null;
+        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+            $fileTmpPath = $_FILES['photo']['tmp_name'];
+            $fileName = $_FILES['photo']['name'];
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+            
+            if (in_array($fileExtension, $allowedExtensions)) {
+                $uploadDir = 'uploads/';
+                
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $newFileName = uniqid('profile_', true) . '.' . $fileExtension;
+                $uploadPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $uploadPath)) {
+                    $photo = $newFileName;  
+                } else {
+                    echo 'Erreur lors du déplacement du fichier téléchargé.';
+                }
+            } else {
+                echo 'Les formes qui sont autorisées JPG, PNG, and GIF.';
+            }
+        }
+
+        $result = updateAccountClient($ID, $nom, $prenom, $telephone, $email, $password, $photo);
+
+        if ($result) {
+            echo 'Profile a été modifiée avec succes.';
+        } else {
+            echo 'Un probleme s\'est produit lors de la modification du profile.';
+        }
+    }
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,8 +92,9 @@
                     <img src="/Systeme de Réservation de Consultations Juridiques/public/images/lawyer_logo.png" class="mr-3 mt-[-2rem] w-[11rem]" alt="Site Web Logo" />
                 </a>
                 <div class="flex items-center lg:order-2 mt-[-3rem]">
-                    <a href="login.php" class="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">Log in</a>
-                    <a href="register.php" class="text-white bg-yellow-500 hover:opacity-80 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">Get started</a>
+                    <button type="button" class="text-white bg-yellow-500 hover:opacity-85 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <a href="login.php"> Se deconnecter </a>
+                    </button>
                     <button data-collapse-toggle="mobile-menu-2" type="button" class="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="mobile-menu-2" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
@@ -50,56 +122,103 @@
     </header>
 
     <main>
-        <section>
-            <div>
-                <div class="container mx-auto py-8">
-                    <div class="grid grid-cols-4 sm:grid-cols-12 gap-6 px-4">
 
-                        <div class="col-span-4 sm:col-span-3">
-                            <div class="bg-white shadow rounded-lg p-6">
-                                <div class="flex flex-col items-center">
-                                    <img src="https://wallpapers.com/images/hd/professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg" class="w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0">
-
-                                    </img>
-                                    <h1 class="text-xl font-bold">Ahmed Rachad</h1>
-                                    <p class="text-lg text-stone-600 font-semibold">Client</p>
-                                    <button type="button" class="ml-[1rem] mt-[1.9rem] text-white bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Modifier</button>
-                                </div>
+        <!-- Profile Form-->
+        <div id="ctnrcsltion" class="hidden fixed left-[32rem] top-[0rem] flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+            <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                <i id="xmarkcsltion" class="fa-solid fa-xmark ml-[26rem] text-2xl cursor-pointer mt-[1.2rem]" style="color: #2e2e2e;"></i>
+                <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                    <h1 class="text-xl mt-[-2rem] font-bold leading-tight tracking-tight text-stone-700 md:text-2xl dark:text-white">
+                        Modifier Votre Profile
+                    </h1>
+                    <form class="space-y-4 md:space-y-6" method="POST" enctype="multipart/form-data">
+                        <div class="grid lg:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nom" class="block mb-2 text-sm font-medium text-stone-700 dark:text-white">Nom</label>
+                                <input type="text" name="nom" id="nom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" >
+                            </div>
+                            <div>
+                                <label for="prenom" class="block mb-2 text-sm font-medium text-stone-700 dark:text-white">Prenom</label>
+                                <input type="text" name="prenom" id="prenom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" >
                             </div>
                         </div>
+                        <div class="grid lg:grid-cols-2 gap-6">
+                            <div>
+                                <label for="telephone" class="block mb-2 text-sm font-medium text-stone-700 dark:text-white">Téléphone</label>
+                                <input type="text" name="telephone" id="telephone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" >
+                            </div>
+                            <div>
+                                <label for="email" class="block mb-2 text-sm font-medium text-stone-700 dark:text-white">Email</label>
+                                <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" >
+                            </div>
+                        </div>
+                            <div>
+                                <label for="password" class="block mb-2 text-sm font-medium text-stone-700 dark:text-white">Password</label>
+                                <input type="password" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" >
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-stone-700 dark:text-white" for="photo">Photo de Profile</label>
+                                <input name="photo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-[7px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="file">
+                            </div>
+                        
+                        <button type="submit" class="ml-[7rem] w-[8rem] text-white bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Confirmer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-                        <div class="col-span-4 sm:col-span-9">
-                            <div class="bg-white shadow rounded-lg p-6">
-                                <div class="w-full my-auto py-6 flex flex-col justify-center gap-2">
-                                    <div class="w-full flex sm:flex-row xs:flex-col gap-2 justify-center">
-                                        <div class="w-full">
+        <?php ?>
+            <section>
+                <div>
+                    <div class="container mx-auto py-8">
+                        <div class="grid grid-cols-4 sm:grid-cols-12 gap-6 px-4">
+
+                            <div class="col-span-4 sm:col-span-3">
+                                <div class="bg-white shadow rounded-lg p-6">
+                                    <div class="flex flex-col items-center">
+                                        <img src="uploads/<?php echo $photo; ?>" class="w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0">
+
+                                        </img>
+                                        <h1 class="text-xl font-bold"><?php echo $nom . ' ' . $prenom; ?></h1>
+                                        <p class="text-lg text-stone-600 font-semibold">Client</p>
+                                        <button id="mdfiebttn" type="button" class="ml-[1rem] mt-[1.9rem] text-white bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Modifier</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-span-4 sm:col-span-9">
+                                <div class="bg-white shadow rounded-lg p-6">
+                                    <div class="w-full my-auto py-6 flex flex-col justify-center gap-2">
+                                        <div class="w-full flex sm:flex-row xs:flex-col gap-2 justify-center">
+                                            <div class="w-full">
+                                                <dl class="text-gray-900 divide-y divide-gray-200 dark:text-white dark:divide-gray-700">
+                                                    <div class="flex flex-col pb-3">
+                                                        <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Nom</dt>
+                                                        <dd class="text-lg text-stone-600 font-semibold"><?php echo $nom; ?></dd>
+                                                    </div>
+                                                    <div class="flex flex-col py-3">
+                                                        <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Prenom</dt>
+                                                        <dd class="text-lg text-stone-600 font-semibold"><?php echo $prenom; ?></dd>
+                                                    </div>
+                                                    <div class="flex flex-col py-3">
+                                                        <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Téléphone</dt>
+                                                        <dd class="text-lg text-stone-600 font-semibold"><?php echo $telephone; ?></dd>
+                                                    </div>
+                                                </dl>
+                                            </div>
+
+                                            <div class="w-full">
                                             <dl class="text-gray-900 divide-y divide-gray-200 dark:text-white dark:divide-gray-700">
-                                                <div class="flex flex-col pb-3">
-                                                    <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Nom</dt>
-                                                    <dd class="text-lg text-stone-600 font-semibold">Ahmed</dd>
-                                                </div>
-                                                <div class="flex flex-col py-3">
-                                                    <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Prenom</dt>
-                                                    <dd class="text-lg text-stone-600 font-semibold">Rachad</dd>
-                                                </div>
-                                                <div class="flex flex-col py-3">
-                                                    <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Téléphone</dt>
-                                                    <dd class="text-lg text-stone-600 font-semibold">0784956238</dd>
-                                                </div>
-                                            </dl>
-                                        </div>
-
-                                        <div class="w-full">
-                                        <dl class="text-gray-900 divide-y divide-gray-200 dark:text-white dark:divide-gray-700">
-                                                <div class="flex flex-col pb-3">
-                                                    <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Email</dt>
-                                                    <dd class="text-lg text-stone-600 font-semibold">rachad@gmail.com</dd>
-                                                </div>
-                                                <div class="flex flex-col py-3">
-                                                    <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Mot de passe</dt>
-                                                    <dd class="text-lg text-stone-600 font-semibold">rcd/*89/*amd</dd>
-                                                </div>
-                                            </dl>
+                                                    <div class="flex flex-col pb-3">
+                                                        <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Email</dt>
+                                                        <dd class="text-lg text-stone-600 font-semibold"><?php echo $email; ?></dd>
+                                                    </div>
+                                                    <div class="flex flex-col py-3">
+                                                        <dt class="mb-1 text-stone-900 font-bold text-base dark:text-gray-400">Mot de passe</dt>
+                                                        <dd class="text-lg text-stone-600 font-semibold"><?php echo $mot_de_passe; ?></dd>
+                                                    </div>
+                                                </dl>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -107,9 +226,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
+            </section>
+        <?php ?>
     </main>
 
     <footer class="bg-white rounded-lg shadow dark:bg-gray-900 m-4">
@@ -134,6 +252,8 @@
             <span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024 <a href="https://flowbite.com/" class="hover:underline">Lawyer</a>. Tous droits réservés.</span>
         </div>
     </footer>
+
+    <script src="../js/script.js"></script>
     
 </body>
 </html>
