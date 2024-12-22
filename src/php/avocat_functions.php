@@ -53,5 +53,66 @@ function loginAccount($email, $password){
 }
 
 
+// Fonction de Modification du Profile
+function updateAccount($ID, $nom, $prenom, $telephone, $email, $password, $photo, $biographie) {
+    global $conn;
+
+    $params = [$nom, $prenom, $telephone, $email, $biographie];
+    $updatePassword = '';
+    $updatePhoto = '';
+
+    if (!empty($password)) {
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        $params[] = $password;  
+        $updatePassword = ", Mot_de_passe = ?";
+    }
+
+    if (!empty($photo)) {
+        $params[] = $photo;  
+        $updatePhoto = ", Photo = ?";
+    }
+
+    $params[] = $ID;
+
+    $sql = "UPDATE utilisateur SET Nom = ?, Prenom = ?, Telephone = ?, Email = ?, Biographie = ?" . $updatePassword . $updatePhoto . " WHERE ID = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    $types = str_repeat('s', count($params) - 1);  
+    $types .= 'i'; 
+
+    $stmt->bind_param($types, ...$params);
+
+    $result = $stmt->execute();
+    $stmt->close();
+
+    return $result;  
+}
+
+
+// Afficher le Profile Avocat
+function getAvocatProfile($ID) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT Nom, Prenom, Photo, Biographie, Telephone, Email, Mot_de_passe FROM utilisateur WHERE ID = ?");
+    $stmt->bind_param("i", $ID);
+    $stmt->execute();
+
+    $stmt->bind_result($Nom, $Prenom, $Photo, $Biographie, $Telephone, $Email, $Mot_de_passe);
+
+    if($stmt->fetch()){
+        return [
+            'Nom' => $Nom,
+            'Prenom' => $Prenom,
+            'Photo' => $Photo,
+            'Biographie' => $Biographie,
+            'Telephone' => $Telephone,
+            'Email' => $Email,
+            'Mot_de_passe' => $Mot_de_passe
+        ];
+    }
+    else{
+        return null;
+    }
+}
 
 ?>
