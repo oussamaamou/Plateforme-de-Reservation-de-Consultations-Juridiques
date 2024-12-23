@@ -1,15 +1,17 @@
 <?php 
     include 'config.php';
-    include 'client_functions.php';
+    include 'avocat_functions.php';
 
     session_start();
 
     $ID = $_SESSION['ID'];
 
-    $reservations = getAllReservation($ID);
+    $reservations = editAllReservation($ID);
 
     $ID_Reservation = $_POST['reservation_ID'] ?? null;
-    annulerReservation($ID_Reservation);
+    if ($ID_Reservation) {
+        annulerReservation($ID_Reservation);
+    }
 
     if(!isset($_SESSION['ID'])){
         header('location: login.php');
@@ -50,16 +52,16 @@
                 <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1 mt-[-3rem]" id="mobile-menu-2">
                     <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
                         <li>
-                            <a href="client_dashboard.php" class="block py-2 pr-4 pl-3 text-stone-700 rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white" aria-current="page">Home</a>
+                            <a href="avocat_dashboard.php" class="block py-2 pr-4 pl-3 text-stone-700 rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white" aria-current="page">Home</a>
                         </li>
                         <li>
-                            <a href="client_profile.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Profile</a>
+                            <a href="avocat_profile.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Profile</a>
                         </li>
                         <li>
-                            <a href="afficher_reservations.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Reservations</a>
+                            <a href="manipuler_reservations.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Reservations</a>
                         </li>
                         <li>
-                            <a href="afficher_consultations.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Consultations</a>
+                            <a href="avocat_disponibilite.php" class="block py-2 pr-4 pl-3 text-stone-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Disponibilité</a>
                         </li>
                     </ul>
                 </div>
@@ -67,12 +69,10 @@
         </nav>
     </header>
 
-    <main class="pt-[3rem]">
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <div class="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900">
-                
-                <input type="hidden" name="reservation_ID" id="reservation_ID" value="">
-                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <main class="pt-[3rem] xl:scale-100 scale-80">
+        <div class="relative overflow-x-auto shadow-md rounded-lg">
+            <div class="flex items-center justify-between flex-row flex-wrap space-y-0 py-4 bg-white dark:bg-gray-900">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-6 py-3">
@@ -87,9 +87,15 @@
                             <th scope="col" class="annltbl px-6 py-3">
                                 Action
                             </th>
+                            <th scope="col" class="annltbl px-6 py-3">
+                                Action
+                            </th>
                             
                         </tr>
                     </thead>
+                    <form id="cancelReservationForm" method="POST" action="">
+                        <input type="hidden" name="reservation_ID" id="reservation_ID" value="">
+                    </form>
                     <?php foreach($reservations as $reservation){ ?>
                     <tbody id="rsrvtioncard">
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -111,6 +117,9 @@
                             </td>
                             <td class="annltbl px-6 py-4">
                                 <button onclick="getIdReservation(<?php echo $reservation['reservation_id']; ?>)" class="font-medium text-red-600 hover:cursor-pointer">Annuler</button>
+                            </td>
+                            <td class="annltbl px-6 py-4">
+                                <button id="accpttbl" class="font-medium text-green-600 hover:cursor-pointer">Accepter</button>
                             </td>
                             
                         </tr>
@@ -149,7 +158,16 @@
 
         function getIdReservation(reservation_ID) {
             document.getElementById("reservation_ID").value = reservation_ID;
+            document.getElementById("cancelReservationForm").submit();
 
+        };
+
+        function acceptReservation() {
+            document.getElementById("accpttbl").addEventListener('click', function() {
+                document.querySelectorAll(".annltbl").forEach( element => {
+                    element.classList.add('hidden');
+                });
+            });
         };
         
     </script>
