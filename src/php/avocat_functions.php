@@ -115,4 +115,49 @@ function getAvocatProfile($ID) {
     }
 }
 
+
+// Manipuler les Reservations
+function editAllReservation($avocat_id) {
+    global $conn;
+    
+    $sql = "
+        SELECT 
+            r.ID AS reservation_id, 
+            r.Date_Consultation, 
+            r.Statut, 
+            c.Nom AS client_nom, 
+            c.Prenom AS client_prenom, 
+            c.Email AS client_email, 
+            c.Photo AS client_photo,
+            a.Nom AS avocat_nom, 
+            a.Prenom AS avocat_prenom,
+            a.Email AS avocat_email,
+            a.Photo AS avocat_photo
+        FROM 
+            reservation r
+        JOIN 
+            utilisateur c ON r.ID_Client = c.ID
+        JOIN 
+            utilisateur a ON r.ID_Avocat = a.ID
+        WHERE 
+            r.ID_Avocat = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $avocat_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+function annulerReservation($id) {
+    global $conn;
+
+    $stmt = $conn->prepare("DELETE FROM reservation WHERE id = ?");
+    $stmt->bind_param("i", $id);
+
+    return $stmt->execute();
+}
+
+
 ?>
