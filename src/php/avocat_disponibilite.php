@@ -1,11 +1,25 @@
 <?php 
+    include 'config.php';
+    include 'avocat_functions.php';
 
     session_start();
-
+    
+    $avocat_ID = $_SESSION['ID'];
+    
     if(!isset($_SESSION['ID'])){
         header('location: login.php');
         exit();
     }
+
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $date_debut = $_POST['date_debut'];
+        $date_fin = $_POST['date_fin'];
+
+        saisirIndisponibilite($avocat_ID, $date_debut, $date_fin);
+
+    }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -57,6 +71,34 @@
             </div>
         </nav>
     </header>
+
+    <main>
+        <section class="bg-gray-50 dark:bg-gray-900">
+            <div class="flex justify-center items-center font-[sans-serif] h-full min-h-screen p-4"
+            style="background-image: url(https://azbklawyer.com/wp-content/uploads/2023/10/tax-debt-lawyer-Phoenix-AZ-1.jpg); background-repeat: no-repeat; background-size: cover;">
+                <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                    <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                                Periode d'Indisponibilite
+                            </h1>
+                            <form class="space-y-4 md:space-y-6" method="POST">
+                                <div class="mb-5">
+                                    <label for="date_debut" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date de Debut</label>
+                                    <input type="date" id="date_debut" name="date_debut" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required />
+                                </div>
+                                <div class="mb-5">
+                                    <label for="date_fin" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date de Fin</label>
+                                    <input type="date" id="date_fin" name="date_fin" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required />
+                                </div>
+                                <button type="submit" class="w-full text-white bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Ajouter</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
 
     <script src="../js/script.js"></script>

@@ -56,19 +56,19 @@
                 if (move_uploaded_file($fileTmpPath, $uploadPath)) {
                     $photo = $newFileName;  
                 } else {
-                    echo 'Error moving uploaded file.';
+                    echo '';
                 }
             } else {
-                echo 'Invalid file type. Only JPG, PNG, and GIF are allowed.';
+                echo '';
             }
         }
 
         $result = updateAccount($ID, $nom, $prenom, $telephone, $email, $password, $photo, $biographie);
 
         if ($result) {
-            echo 'Profile updated successfully.';
+            echo '';
         } else {
-            echo 'Error updating profile.';
+            echo '';
         }
     }
 

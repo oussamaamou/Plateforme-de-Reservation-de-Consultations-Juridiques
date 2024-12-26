@@ -21,7 +21,7 @@
         $mot_de_passe = $clientProfile['Mot_de_passe'];
     } else {
 
-        echo "Profile non trouvé.";
+        echo "";
         exit();
     }
 
@@ -53,19 +53,19 @@
                 if (move_uploaded_file($fileTmpPath, $uploadPath)) {
                     $photo = $newFileName;  
                 } else {
-                    echo 'Erreur lors du déplacement du fichier téléchargé.';
+                    echo '';
                 }
             } else {
-                echo 'Les formes qui sont autorisées JPG, PNG, and GIF.';
+                echo '';
             }
         }
 
         $result = updateAccountClient($ID, $nom, $prenom, $telephone, $email, $password, $photo);
 
         if ($result) {
-            echo 'Profile a été modifiée avec succes.';
+            echo '';
         } else {
-            echo 'Un probleme s\'est produit lors de la modification du profile.';
+            echo '';
         }
     }
 

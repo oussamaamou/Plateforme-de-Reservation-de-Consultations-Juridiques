@@ -40,13 +40,13 @@ function loginAccount($email, $password){
                     exit();
                 }
             } else {
-                echo "Mot de passe incorrect.";
+                echo "";
             }
         } else {
-            echo "Email non trouvé.";
+            echo "";
         }
     } else {
-        echo "Erreur lors de l'exécution de la requête.";
+        echo "";
     }
 
     $stmt->close();
@@ -155,6 +155,16 @@ function annulerReservation($id) {
 
     $stmt = $conn->prepare("DELETE FROM reservation WHERE id = ?");
     $stmt->bind_param("i", $id);
+
+    return $stmt->execute();
+}
+
+// Ajouter l'Indisponibilite
+function saisirIndisponibilite($ID, $Date_debut, $Date_fin){
+    global $conn;
+
+    $stmt = $conn->prepare("INSERT INTO indisponibilite (ID_Avocat, Date_Debut, Date_Fin) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $ID, $Date_debut, $Date_fin);
 
     return $stmt->execute();
 }
